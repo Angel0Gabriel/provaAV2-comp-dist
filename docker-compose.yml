@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  product-page:
+    image: python:3.8
+    volumes:
+      - ./product:/app
+    command: python /app/server.py
+    ports:
+      - "5000:5000"
+
+  reviews-v1:
+    image: openjdk:11
+    volumes:
+      - ./reviews-v1:/app
+    command: java -jar /app/reviews.jar
+
+  reviews-v2:
+    image: openjdk:11
+    volumes:
+      - ./reviews-v2:/app
+    command: java -jar /app/reviews.jar
+
+  reviews-v3:
+    image: openjdk:11
+    volumes:
+      - ./reviews-v3:/app
+    command: java -jar /app/reviews.jar
+
+  ratings:
+    image: node:14
+    volumes:
+      - ./ratings:/app
+    command: node /app/server.js
+    ports:
+      - "4000:4000"
+
+  details:
+    image: ruby:2.7
+    volumes:
+      - ./details:/app
+    command: ruby /app/server.rb
+
+  locust:
+    image: locustio/locust
+    volumes:
+      - ./locust:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --host=http://product-page:5000
+    ports:
+      - "8089:8089"
+
+networks:
+  default:
+    external:
+      name: my-network
